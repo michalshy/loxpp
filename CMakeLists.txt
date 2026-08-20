@@ -28,14 +28,15 @@ endif()
 
 add_library(loxpp_core
     src/test.cpp
+    src/common.h
+    src/chunk.h
+    src/chunk.cpp
+    src/memory.h
 )
 add_library(loxpp::core ALIAS loxpp_core)
 
 target_include_directories(loxpp_core
     PUBLIC
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-        $<INSTALL_INTERFACE:include>
-    PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 
