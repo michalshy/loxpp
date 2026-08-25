@@ -2,6 +2,7 @@
 #define src_chunk_h
 
 #include "common.h"
+#include "value.h"
 
 enum class OpCode : u8 {
     RETURN,
@@ -9,7 +10,8 @@ enum class OpCode : u8 {
 
 class Chunk
 {
-    std::vector<u8> code;
+    std::vector<u8> code{};
+    Values constants{};
 public:
     Chunk();
 

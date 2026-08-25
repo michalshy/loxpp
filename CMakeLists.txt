@@ -34,6 +34,8 @@ add_library(loxpp_core
     src/memory.h
     src/debug.cpp
     src/debug.h
+    src/value.h
+    src/value.cpp
 )
 add_library(loxpp::core ALIAS loxpp_core)
 

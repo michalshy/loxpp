@@ -4,6 +4,7 @@
 
 Chunk::Chunk()
     : code(BASE_CHUNK_CAPACITY)
+    , constants()
 {
 }
 
