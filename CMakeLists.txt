@@ -32,6 +32,8 @@ add_library(loxpp_core
     src/chunk.h
     src/chunk.cpp
     src/memory.h
+    src/debug.cpp
+    src/debug.h
 )
 add_library(loxpp::core ALIAS loxpp_core)
 

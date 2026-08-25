@@ -15,6 +15,9 @@ public:
 
     void write(const u8& byte);
     void write(const OpCode& op);
+
+    size_t size() { return code.size(); }
+    u8 get(size_t offset) { return code[offset]; }
 };
 
 #endif // src_chunk_h
