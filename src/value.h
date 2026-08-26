@@ -8,12 +8,14 @@ using value = double;
 
 class Values
 {
-    u64 capacity{0};
-    u64 count{0};
     std::vector<value> values{};
 
 public:
     void write(value v);
+
+    [[nodiscard]] const value& get(u8 idx) { return values[idx]; }
+    [[nodiscard]] u64 count() const { return values.size(); }
+    [[nodiscard]] u64 capacity() const { return values.capacity(); }
 };
 
 #endif // src_value_h

@@ -11,7 +11,7 @@ namespace debug
 // disassembles chunk
 void disassemble(Chunk& chunk, std::string_view name);
 // disassembles instruction
-u64 disassemble(Chunk& chunk, size_t offset);
+[[nodiscard]] u64 disassemble(Chunk& chunk, size_t offset);
 
 }
 

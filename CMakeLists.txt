@@ -27,7 +27,6 @@ if(LOXPP_ENABLE_WARNINGS_AS_ERRORS)
 endif()
 
 add_library(loxpp_core
-    src/test.cpp
     src/common.h
     src/chunk.h
     src/chunk.cpp
@@ -36,6 +35,8 @@ add_library(loxpp_core
     src/debug.h
     src/value.h
     src/value.cpp
+    src/line.h
+    src/line.cpp
 )
 add_library(loxpp::core ALIAS loxpp_core)
 
@@ -51,7 +52,7 @@ target_link_libraries(loxpp PRIVATE loxpp::core loxpp_warnings)
 
 include(FetchContent)
 
-if(VMLOX_BUILD_TESTS)
+if(LOXPP_BUILD_TESTS)
     FetchContent_Declare(
         Catch2
         GIT_REPOSITORY https://github.com/catchorg/Catch2.git
