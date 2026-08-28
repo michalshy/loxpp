@@ -55,6 +55,9 @@ add_library(loxpp_core
     src/value.cpp
     src/line.h
     src/line.cpp
+    src/vm.cpp
+    src/vm.h
+    src/opcode.h
 )
 add_library(loxpp::core ALIAS loxpp_core)
 
