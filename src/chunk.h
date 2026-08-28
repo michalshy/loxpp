@@ -1,22 +1,22 @@
-#ifndef src_chunk_h
-#define src_chunk_h
+#ifndef chunk_h
+#define chunk_h
 
 #include "common.h"
-#include "value.h"
 #include "line.h"
-#include <deque>
+#include "value.h"
+#include <vector>
 
 enum class OpCode : u8 {
     CONSTANT,
     RETURN,
 };
 
-class Chunk
-{
+class Chunk {
     std::vector<u8> code{};
-    std::deque<Line> lines{};
+    std::vector<Line> lines{};
     Values constants{};
-public:
+
+  public:
     Chunk();
 
     void write(const u8& byte, u32 line);
@@ -27,9 +27,10 @@ public:
     [[nodiscard]] size_t size() { return code.size(); }
     [[nodiscard]] const u8& byte(size_t offset) { return code[offset]; }
     [[nodiscard]] const value& constant(u8 idx) { return constants.get(idx); }
-    [[nodiscard]] u64 get_line(size_t offset);
-private:
+    [[nodiscard]] i64 get_line(size_t offset);
+
+  private:
     void insert_line(u64 line);
 };
 
-#endif // src_chunk_h
+#endif // chunk_h

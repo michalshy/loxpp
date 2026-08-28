@@ -1,16 +1,15 @@
-#ifndef src_value_h
-#define src_value_h
+#ifndef value_h
+#define value_h
 
 #include "common.h"
 #include <vector>
 
 using value = double;
 
-class Values
-{
+class Values {
     std::vector<value> values{};
 
-public:
+  public:
     void write(value v);
 
     [[nodiscard]] const value& get(u8 idx) { return values[idx]; }
@@ -18,4 +17,4 @@ public:
     [[nodiscard]] u64 capacity() const { return values.capacity(); }
 };
 
-#endif // src_value_h
+#endif // value_h

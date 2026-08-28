@@ -16,7 +16,8 @@ option(LOXPP_ENABLE_WARNINGS_AS_ERRORS ON)
 
 add_library(loxpp_warnings INTERFACE)
 target_compile_options(loxpp_warnings INTERFACE
-    $<$<CXX_COMPILER_ID:GNU,Clang>:-Wall -Wextra -Wpedantic -Wshadow -Wconversion>
+    $<$<CXX_COMPILER_ID:GNU,Clang>:
+      -Wall -Wextra -Wpedantic -Wshadow -Wconversion>
     $<$<CXX_COMPILER_ID:MSVC>:/W4>
 )
 if(LOXPP_ENABLE_WARNINGS_AS_ERRORS)

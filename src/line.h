@@ -1,20 +1,16 @@
-#ifndef src_line_h
-#define src_line_h
+#ifndef line_h
+#define line_h
 
 #include "common.h"
-class Line
-{
-    u64 count{1};
+class Line {
     u64 line;
+    u64 offset;
 
-public:
-    explicit Line(u64 l) : line(l){}
+  public:
+    Line(u64 l, u64 off) : line(l), offset(off) {}
 
-    void push() { count++; }
-    void pull() { count--; }
-
-    u64 get_line() { return line; }
-    u64 get_count() { return count; }
+    [[nodiscard]] u64 get_line() const { return line; }
+    [[nodiscard]] u64 get_offset() const { return offset; }
 };
 
-#endif // src_line_h
+#endif // line_h
