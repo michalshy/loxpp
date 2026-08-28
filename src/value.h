@@ -12,7 +12,7 @@ class Values {
   public:
     void write(value v);
 
-    [[nodiscard]] const value& get(u8 idx) { return values[idx]; }
+    [[nodiscard]] const value& get(size_t idx) { return values[idx]; }
     [[nodiscard]] u64 count() const { return values.size(); }
     [[nodiscard]] u64 capacity() const { return values.capacity(); }
 };

@@ -17,7 +17,24 @@ option(LOXPP_ENABLE_WARNINGS_AS_ERRORS ON)
 add_library(loxpp_warnings INTERFACE)
 target_compile_options(loxpp_warnings INTERFACE
     $<$<CXX_COMPILER_ID:GNU,Clang>:
-      -Wall -Wextra -Wpedantic -Wshadow -Wconversion>
+      -Wall -Wextra -Wpedantic -Wshadow -Wconversion
+      -Wsign-conversion
+      -Wold-style-cast
+      -Wcast-align
+      -Wswitch-enum
+      -Wunused
+      -Woverloaded-virtual
+      -Wnon-virtual-dtor
+      -Wnull-dereference
+      -Wdouble-promotion
+      -Wformat=2
+      -Wimplicit-fallthrough>
+    $<$<CXX_COMPILER_ID:GNU>:
+      -Wlogical-op
+      -Wuseless-cast
+      -Wduplicated-cond
+      -Wduplicated-branches
+      -Wmisleading-indentation>
     $<$<CXX_COMPILER_ID:MSVC>:/W4>
 )
 if(LOXPP_ENABLE_WARNINGS_AS_ERRORS)

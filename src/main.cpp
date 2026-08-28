@@ -5,7 +5,7 @@
 int main() {
     Chunk chunk{};
 
-    u8 cnst = chunk.add_constant(1.2);
+    u8 cnst = static_cast<u8>(chunk.add_constant(1.2));
 
     chunk.write(OpCode::CONSTANT, 123);
     chunk.write(cnst, 123);

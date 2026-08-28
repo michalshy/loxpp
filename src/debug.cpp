@@ -21,15 +21,25 @@ size_t simple_instr(std::string_view name, size_t offset) {
     return offset + 1;
 }
 
-size_t constant_instr(std::string_view name, Chunk& chunk, size_t offset) {
-    u8 idx = chunk.byte(offset + 1);
+size_t constant_instr(std::string_view name, Chunk& chunk, size_t offset,
+                      OpCode instruction) {
+    size_t idx = [&]() {
+        if (instruction == OpCode::CONSTANT) {
+            return static_cast<size_t>(chunk.byte(offset + 1));
+        } else {
+            return static_cast<size_t>(chunk.byte(offset + 3) << 16 |
+                                       chunk.byte(offset + 2) << 8 |
+                                       chunk.byte(offset + 1));
+        }
+    }();
 
     std::print("    {} {:4d}", name, idx); // chunk header
 
     value val = chunk.constant(idx);
     std::println("  '{}'", val);
 
-    return offset + 2;
+    u8 additional = instruction == OpCode::CONSTANT ? 2 : 4;
+    return offset + additional;
 }
 } // namespace internal
 
@@ -56,7 +66,10 @@ u64 disassemble(Chunk& chunk, size_t offset) {
     case OpCode::RETURN:
         return internal::simple_instr("RETURN", offset);
     case OpCode::CONSTANT:
-        return internal::constant_instr("CONSTANT", chunk, offset);
+        return internal::constant_instr("CONSTANT", chunk, offset, instruction);
+    case OpCode::CONSTANT_LONG:
+        return internal::constant_instr("CONSTANT_LONG", chunk, offset,
+                                        instruction);
     default:
         std::println("Unknown opcode {:d}", raw);
         return offset + 1;
