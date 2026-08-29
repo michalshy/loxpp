@@ -66,6 +66,15 @@ u64 disassemble(Chunk& chunk, size_t offset) {
                                         instruction);
     case OpCode::NEGATE:
         return internal::simple_instr("NEGATE", offset);
+    case OpCode::ADD:
+        return internal::simple_instr("ADD", offset);
+    case OpCode::SUBTRACT:
+        return internal::simple_instr("SUBTRACT", offset);
+    case OpCode::MULTIPLY:
+        return internal::simple_instr("MULTIPLY", offset);
+    case OpCode::DIVIDE:
+        return internal::simple_instr("DIVIDE", offset);
+
     default:
         std::println("Unknown opcode {:d}", raw);
         return offset + 1;

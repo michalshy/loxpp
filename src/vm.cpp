@@ -41,6 +41,10 @@ std::expected<void, InterpretError> VM::run() {
             ip += 3;
             break;
         }
+        case OpCode::ADD:      binary(std::plus<>{});      break;
+        case OpCode::SUBTRACT: binary(std::minus<>{});     break;
+        case OpCode::MULTIPLY: binary(std::multiplies<>{}); break;
+        case OpCode::DIVIDE:   binary(std::divides<>{});   break;
         case OpCode::NEGATE: {
             stack.push(-pop_stack());
             break;

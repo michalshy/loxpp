@@ -2,6 +2,7 @@
 #define vm_h
 
 #include "chunk.h"
+#include "concepts.h"
 #include "value.h"
 #include <expected>
 #include <stack>
@@ -29,6 +30,13 @@ class VM {
     std::expected<void, InterpretError> run();
 
     value pop_stack();
+
+    template <BinaryOp Op> void binary(Op op) {
+        value a = pop_stack();
+        value b = pop_stack();
+        stack.push(op(a, b));
+    }
+
     VM() = default;
 };
 

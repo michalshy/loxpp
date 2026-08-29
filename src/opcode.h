@@ -6,6 +6,10 @@
 enum class OpCode : u8 {
     CONSTANT,
     CONSTANT_LONG,
+    ADD,
+    SUBTRACT,
+    MULTIPLY,
+    DIVIDE,
     NEGATE,
     RETURN,
 };
