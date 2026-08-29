@@ -1,6 +1,7 @@
 #include "chunk.h"
 #include "common.h"
-#include "debug.h"
+#include "opcode.h"
+#include "vm.h"
 
 int main() {
     Chunk chunk{};
@@ -9,10 +10,11 @@ int main() {
 
     chunk.write(OpCode::CONSTANT, 123);
     chunk.write(cnst, 123);
-
+    chunk.write(OpCode::NEGATE, 123);
     chunk.write(OpCode::RETURN, 124);
 
-    debug::disassemble(chunk, "test_chunk");
+    std::expected<void, InterpretError> res = VM::Instance().interpret(chunk);
+    (void)res;
 
     return 0;
 }

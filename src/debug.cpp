@@ -1,7 +1,9 @@
 #include "debug.h"
 #include "chunk.h"
 #include "common.h"
+#include "opcode.h"
 #include "value.h"
+#include "vm.h"
 #include <print>
 #include <string_view>
 
@@ -23,15 +25,7 @@ size_t simple_instr(std::string_view name, size_t offset) {
 
 size_t constant_instr(std::string_view name, Chunk& chunk, size_t offset,
                       OpCode instruction) {
-    size_t idx = [&]() {
-        if (instruction == OpCode::CONSTANT) {
-            return static_cast<size_t>(chunk.byte(offset + 1));
-        } else {
-            return static_cast<size_t>(chunk.byte(offset + 3) << 16 |
-                                       chunk.byte(offset + 2) << 8 |
-                                       chunk.byte(offset + 1));
-        }
-    }();
+    size_t idx = detail::constant_idx(chunk, offset + 1, instruction);
 
     std::print("    {} {:4d}", name, idx); // chunk header
 
@@ -70,6 +64,8 @@ u64 disassemble(Chunk& chunk, size_t offset) {
     case OpCode::CONSTANT_LONG:
         return internal::constant_instr("CONSTANT_LONG", chunk, offset,
                                         instruction);
+    case OpCode::NEGATE:
+        return internal::simple_instr("NEGATE", offset);
     default:
         std::println("Unknown opcode {:d}", raw);
         return offset + 1;

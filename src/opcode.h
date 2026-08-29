@@ -6,6 +6,7 @@
 enum class OpCode : u8 {
     CONSTANT,
     CONSTANT_LONG,
+    NEGATE,
     RETURN,
 };
 
