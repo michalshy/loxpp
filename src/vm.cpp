@@ -3,8 +3,13 @@
 #include "opcode.h"
 #include <expected>
 #include <print>
+#include <string_view>
 
 #define DEBUG 1
+
+std::expected<void, InterpretError> VM::interpret(std::string_view source) {
+    compiler->compile(source);
+}
 
 std::expected<void, InterpretError> VM::interpret(Chunk& chunk) {
     curr_chunk = &chunk;
@@ -41,12 +46,20 @@ std::expected<void, InterpretError> VM::run() {
             ip += 3;
             break;
         }
-        case OpCode::ADD:      binary(std::plus<>{});      break;
-        case OpCode::SUBTRACT: binary(std::minus<>{});     break;
-        case OpCode::MULTIPLY: binary(std::multiplies<>{}); break;
-        case OpCode::DIVIDE:   binary(std::divides<>{});   break;
+        case OpCode::ADD:
+            binary(std::plus<>{});
+            break;
+        case OpCode::SUBTRACT:
+            binary(std::minus<>{});
+            break;
+        case OpCode::MULTIPLY:
+            binary(std::multiplies<>{});
+            break;
+        case OpCode::DIVIDE:
+            binary(std::divides<>{});
+            break;
         case OpCode::NEGATE: {
-            stack.push(-pop_stack());
+            stack.top() = stack.top() * -1;
             break;
         }
         default:

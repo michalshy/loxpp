@@ -58,6 +58,10 @@ add_library(loxpp_core
     src/vm.cpp
     src/vm.h
     src/opcode.h
+    src/app.h
+    src/app.cpp
+    src/fs.cpp
+    src/fs.h
 )
 add_library(loxpp::core ALIAS loxpp_core)
 
