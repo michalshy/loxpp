@@ -3,8 +3,8 @@
 
 #include "common.h"
 class Line {
-    u64 line;
-    u64 offset;
+    u64 line{};
+    u64 offset{};
 
   public:
     Line(u64 l, u64 off) : line(l), offset(off) {}

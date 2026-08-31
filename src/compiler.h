@@ -6,7 +6,7 @@
 #include <string_view>
 
 class Compiler {
-    std::unique_ptr<Scanner> scanner;
+    std::unique_ptr<Scanner> scanner{};
 
   public:
     Compiler() : scanner(std::make_unique<Scanner>()) {}

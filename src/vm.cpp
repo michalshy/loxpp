@@ -9,6 +9,7 @@
 
 std::expected<void, InterpretError> VM::interpret(std::string_view source) {
     compiler->compile(source);
+    return {};
 }
 
 std::expected<void, InterpretError> VM::interpret(Chunk& chunk) {

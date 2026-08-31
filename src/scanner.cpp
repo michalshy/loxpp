@@ -1,4 +1,3 @@
 #include "scanner.h"
-#include <string_view>
 
-void Scanner::init(std::string_view source) {}
+void Scanner::init(std::string_view s) { source = s; }
