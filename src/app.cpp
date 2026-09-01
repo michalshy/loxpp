@@ -1,15 +1,11 @@
 #include "app.h"
 #include <cstddef>
-#include <fstream>
-#include <ios>
 #include <iostream>
 #include <print>
 #include <string>
 
-#include "chunk.h"
 #include "common.h"
 #include "fs.h"
-#include "opcode.h"
 #include "vm.h"
 
 void App::run(int argc, const char* argv[]) {
@@ -30,7 +26,13 @@ void App::repl() {
     while (!exit) {
         std::print(">  ");
         if (std::getline(std::cin, line)) {
-            VM::Instance().interpret(line);
+            std::expected<void, InterpretError> result =
+                VM::Instance().interpret(line);
+
+            if (!result.has_value()) {
+                std::println("Error during execution: {}",
+                             static_cast<size_t>(result.error()));
+            }
         } else {
             std::println();
         }
@@ -47,7 +49,10 @@ void App::run_file(std::filesystem::path path) {
     std::expected<void, InterpretError> result =
         VM::Instance().interpret(content.value());
 
-    // check result
+    if (!result.has_value()) {
+        std::println("Error during execution: {}",
+                     static_cast<size_t>(result.error()));
+    }
 }
 
 Mode App::check_mode(int no) {

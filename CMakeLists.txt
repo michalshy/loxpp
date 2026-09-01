@@ -62,6 +62,10 @@ add_library(loxpp_core
     src/app.cpp
     src/fs.cpp
     src/fs.h
+    src/compiler.h
+    src/compiler.cpp
+    src/scanner.h
+    src/scanner.cpp
 )
 add_library(loxpp::core ALIAS loxpp_core)
 

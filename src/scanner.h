@@ -2,71 +2,33 @@
 #define scanner_h
 
 #include "common.h"
+#include "token.h"
 #include <string_view>
-
-enum class TokenType {
-    // Single-character tokens.
-    LEFT_PAREN,
-    RIGHT_PAREN,
-    LEFT_BRACE,
-    RIGHT_BRACE,
-    COMMA,
-    DOT,
-    MINUS,
-    PLUS,
-    SEMICOLON,
-    SLASH,
-    STAR,
-    // One or two character tokens.
-    BANG,
-    BANG_EQUAL,
-    EQUAL,
-    EQUAL_EQUAL,
-    GREATER,
-    GREATER_EQUAL,
-    LESS,
-    LESS_EQUAL,
-    // Literals.
-    IDENTIFIER,
-    STRING,
-    NUMBER,
-    // Keywords.
-    AND,
-    CLASS,
-    ELSE,
-    FALSE,
-    FOR,
-    FUN,
-    IF,
-    NIL,
-    OR,
-    PRINT,
-    RETURN,
-    SUPER,
-    THIS,
-    TRUE,
-    VAR,
-    WHILE,
-
-    ERROR,
-    EOF
-};
-
-struct Token {
-    TokenType type;
-    std::string_view token;
-    u64 line;
-};
 
 class Scanner {
     std::string_view source;
     u64 start{0};
     u64 current{0};
-    u64 line{0};
+    u64 line{1};
 
   public:
-    void init(std::string_view s);
-    Token scan();
+    void init(std::string_view);
+    [[nodiscard]] Token scan();
+
+  private:
+    void skip_whitespaces();
+    [[nodiscard]] bool finished();
+    [[nodiscard]] Token create(TokenType);
+    char advance();
+    [[nodiscard]] bool is_alpha(char);
+    [[nodiscard]] Token identifier();
+    [[nodiscard]] TokenType identifier_type();
+    [[nodiscard]] bool is_digit(char);
+    [[nodiscard]] Token number();
+    [[nodiscard]] bool match(char);
+    [[nodiscard]] Token error(std::string_view);
+    [[nodiscard]] char peek();
+    [[nodiscard]] char peek_next();
 };
 
 #endif
