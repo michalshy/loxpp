@@ -1,6 +1,7 @@
 #ifndef compiler_h
 #define compiler_h
 
+#include "chunk.h"
 #include "scanner.h"
 #include <memory>
 #include <string_view>
@@ -10,7 +11,7 @@ class Compiler {
 
   public:
     Compiler() : scanner(std::make_unique<Scanner>()) {}
-    void compile(std::string_view source);
+    bool compile(std::string_view source, Chunk& chunk);
 };
 
 #endif

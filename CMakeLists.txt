@@ -92,3 +92,9 @@ if(LOXPP_BUILD_TESTS)
     enable_testing()
     add_subdirectory(tests)
 endif()
+
+add_custom_command(TARGET loxpp POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E create_symlink
+        ${CMAKE_CURRENT_SOURCE_DIR}/examples
+        $<TARGET_FILE_DIR:loxpp>/examples
+)

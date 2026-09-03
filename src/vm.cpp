@@ -1,4 +1,5 @@
 #include "vm.h"
+#include "chunk.h"
 #include "debug.h"
 #include "opcode.h"
 #include <expected>
@@ -8,8 +9,16 @@
 #define DEBUG 1
 
 std::expected<void, InterpretError> VM::interpret(std::string_view source) {
-    compiler->compile(source);
-    return {};
+    Chunk chunk{};
+
+    if (compiler->compile(source, chunk)) {
+        return std::unexpected(InterpretError::COMPILE_ERROR);
+    }
+
+    curr_chunk = &chunk;
+    ip = 0;
+
+    return run();
 }
 
 std::expected<void, InterpretError> VM::interpret(Chunk& chunk) {
