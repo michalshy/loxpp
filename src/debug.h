@@ -5,6 +5,9 @@
 #include "common.h"
 #include <string_view>
 
+#define DEBUG 1
+#define DEBUG_PRINT_CODE 1
+
 namespace debug {
 
 // disassembles chunk

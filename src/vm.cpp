@@ -6,8 +6,6 @@
 #include <print>
 #include <string_view>
 
-#define DEBUG 1
-
 std::expected<void, InterpretError> VM::interpret(std::string_view source) {
     Chunk chunk{};
 

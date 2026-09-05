@@ -1,4 +1,5 @@
 #include "compiler.h"
+#include "debug.h"
 #include "opcode.h"
 #include "precedence.h"
 #include "rule.h"
@@ -49,7 +50,14 @@ void Compiler::consume(TokenType type, std::string_view message) {
     }
 }
 
-void Compiler::end() { emit_return(); }
+void Compiler::end() {
+#if DEBUG_PRINT_CODE
+    if (!parser->had_error) {
+        debug::disassemble(*current(), "code");
+    }
+#endif
+    emit_return();
+}
 
 void Compiler::number() {
     value v = std::stod(parser->prev.token.data());
@@ -122,7 +130,13 @@ void Compiler::parse_precedence(Precedence precedence) {
     if (prefix_rule == nullptr) {
         error("Expected expression.");
     } else {
-        (this->*prefix_rule)(); // ugly
+        (this->*prefix_rule)();
+    }
+
+    while (precedence <= get_rule(parser->curr.type).precedence) {
+        advance();
+        ParseFn infix_rule = get_rule(parser->prev.type).infix;
+        (this->*infix_rule)();
     }
 }
 
