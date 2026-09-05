@@ -3,7 +3,6 @@
 
 #include "common.h"
 #include "line.h"
-#include "opcode.h"
 #include "value.h"
 #include <vector>
 
@@ -18,7 +17,6 @@ class Chunk {
     void write_constant(value val, u64 line);
 
     void write(const u8& byte, u64 line);
-    void write(const OpCode& op, u64 line);
 
     [[nodiscard]] size_t add_constant(value val);
 

@@ -4,6 +4,7 @@
 #include "chunk.h"
 #include "compiler.h"
 #include "concepts.h"
+#include "opcode.h"
 #include "value.h"
 #include <expected>
 #include <memory>

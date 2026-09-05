@@ -5,6 +5,8 @@
 #include <format>
 #include <string_view>
 
+constexpr u8 TOKEN_COUNT = 39;
+
 enum class TokenType {
     // Single-character tokens.
     LEFT_PAREN,

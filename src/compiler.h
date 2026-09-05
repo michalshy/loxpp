@@ -4,12 +4,16 @@
 #include "chunk.h"
 #include "common.h"
 #include "parser.h"
+#include "precedence.h"
+#include "rule.h"
 #include "scanner.h"
 #include "token.h"
 #include "value.h"
 #include <cstddef>
 #include <memory>
 #include <string_view>
+
+using RuleTable = std::array<ParseRule, static_cast<size_t>(TOKEN_COUNT)>;
 
 class Compiler {
     std::unique_ptr<Scanner> scanner{};
@@ -30,6 +34,7 @@ class Compiler {
     void number();
     void grouping();
     void unary();
+    void binary();
 
     Chunk* current();
     void emit_byte(u8 byte);
@@ -39,9 +44,18 @@ class Compiler {
 
     u8 constant(value val);
 
+    void parse_precedence(Precedence precedence);
+
     void error_at_current(std::string_view message);
     void error(std::string_view message);
     void error_at(Token& token, std::string_view message);
+
+    static constexpr RuleTable make_rules();
+    static RuleTable rules;
+
+    const ParseRule& get_rule(TokenType type) const {
+        return rules[static_cast<size_t>(type)];
+    }
 };
 
 #endif
