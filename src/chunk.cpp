@@ -8,7 +8,7 @@
 
 Chunk::Chunk() : code(), constants() { code.reserve(BASE_CHUNK_CAPACITY); }
 
-void Chunk::write_constant(value val, u32 line) {
+void Chunk::write_constant(value val, u64 line) {
     size_t idx = add_constant(val);
     if (idx <= UINT8_MAX) {
         write(OpCode::CONSTANT, line);
@@ -21,14 +21,14 @@ void Chunk::write_constant(value val, u32 line) {
     }
 }
 
-void Chunk::write(const u8& byte, u32 line) {
+void Chunk::write(const u8& byte, u64 line) {
     if (lines.empty() || lines.back().get_line() != line) {
         lines.push_back(Line(line, code.size()));
     }
     code.push_back(byte);
 }
 
-void Chunk::write(const OpCode& op, u32 line) {
+void Chunk::write(const OpCode& op, u64 line) {
     if (lines.empty() || lines.back().get_line() != line) {
         lines.push_back(Line(line, code.size()));
     }
