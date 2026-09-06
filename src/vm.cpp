@@ -9,7 +9,7 @@
 std::expected<void, InterpretError> VM::interpret(std::string_view source) {
     Chunk chunk{};
 
-    if (compiler->compile(source, chunk)) {
+    if (!compiler->compile(source, chunk)) {
         return std::unexpected(InterpretError::COMPILE_ERROR);
     }
 
@@ -33,10 +33,6 @@ std::expected<void, InterpretError> VM::run() {
     }
 
     while (!exit) {
-#if DEBUG
-        debug::disassemble(*curr_chunk, ip);
-#endif
-
         OpCode instruction = static_cast<OpCode>(curr_chunk->byte(ip++));
         switch (instruction) {
         case OpCode::RETURN:

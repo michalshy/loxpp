@@ -29,14 +29,15 @@ bool Compiler::compile(std::string_view source, Chunk& chunk) {
 
 void Compiler::advance() {
     bool exit{false};
-    parser->prev = parser->prev;
+    parser->prev = parser->curr;
 
     while (!exit) {
         parser->curr = scanner->scan();
-        if (parser->curr.type != TokenType::ERROR)
+        if (parser->curr.type != TokenType::ERROR) {
             exit = true;
-
-        error_at_current(parser->curr.token);
+        } else {
+            error_at_current(parser->curr.token);
+        }
     }
 }
 
@@ -51,12 +52,13 @@ void Compiler::consume(TokenType type, std::string_view message) {
 }
 
 void Compiler::end() {
+    emit_return();
+
 #if DEBUG_PRINT_CODE
     if (!parser->had_error) {
         debug::disassemble(*current(), "code");
     }
 #endif
-    emit_return();
 }
 
 void Compiler::number() {
@@ -110,7 +112,7 @@ void Compiler::emit_bytes(u8 first, u8 second) {
 void Compiler::emit_return() { emit_byte(std::to_underlying(OpCode::RETURN)); }
 
 void Compiler::emit_const(value val) {
-    emit_bytes(std::to_underlying(OpCode::RETURN), constant(val));
+    emit_bytes(std::to_underlying(OpCode::CONSTANT), constant(val));
 }
 
 u8 Compiler::constant(value v) {

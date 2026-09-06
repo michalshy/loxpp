@@ -22,7 +22,9 @@ class Compiler {
     Chunk* compilation_chunk{nullptr};
 
   public:
-    Compiler() : scanner(std::make_unique<Scanner>()) {}
+    Compiler()
+        : scanner(std::make_unique<Scanner>()),
+          parser(std::make_unique<Parser>()) {}
     bool compile(std::string_view source, Chunk& chunk);
 
   private:
