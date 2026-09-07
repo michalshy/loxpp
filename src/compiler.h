@@ -37,6 +37,7 @@ class Compiler {
     void grouping();
     void unary();
     void binary();
+    void literal();
 
     Chunk* current();
     void emit_byte(u8 byte);

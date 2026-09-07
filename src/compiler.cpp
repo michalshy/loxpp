@@ -97,6 +97,16 @@ void Compiler::binary() {
     }
 }
 
+void Compiler::literal() {
+    if (parser->prev.type == TokenType::FALSE) {
+        emit_byte(std::to_underlying(OpCode::FALSE));
+    } else if (parser->prev.type == TokenType::TRUE) {
+        emit_byte(std::to_underlying(OpCode::TRUE));
+    } else if (parser->prev.type == TokenType::NIL) {
+        emit_byte(std::to_underlying(OpCode::NIL));
+    }
+}
+
 Chunk* Compiler::current() { return compilation_chunk; }
 
 void Compiler::emit_byte(u8 byte) {
@@ -138,7 +148,9 @@ void Compiler::parse_precedence(Precedence precedence) {
     while (precedence <= get_rule(parser->curr.type).precedence) {
         advance();
         ParseFn infix_rule = get_rule(parser->prev.type).infix;
-        (this->*infix_rule)();
+        if (infix_rule != nullptr) {
+            (this->*infix_rule)();
+        }
     }
 }
 
@@ -209,17 +221,17 @@ Compiler::make_rules() {
     set(TokenType::AND, nullptr, nullptr, Precedence::AND);
     set(TokenType::CLASS, nullptr, nullptr, Precedence::NONE);
     set(TokenType::ELSE, nullptr, nullptr, Precedence::NONE);
-    set(TokenType::FALSE, nullptr, nullptr, Precedence::NONE);
+    set(TokenType::FALSE, &Compiler::literal, nullptr, Precedence::NONE);
     set(TokenType::FOR, nullptr, nullptr, Precedence::NONE);
     set(TokenType::FUN, nullptr, nullptr, Precedence::NONE);
     set(TokenType::IF, nullptr, nullptr, Precedence::NONE);
-    set(TokenType::NIL, nullptr, nullptr, Precedence::NONE);
+    set(TokenType::NIL, &Compiler::literal, nullptr, Precedence::NONE);
     set(TokenType::OR, nullptr, nullptr, Precedence::OR);
     set(TokenType::PRINT, nullptr, nullptr, Precedence::NONE);
     set(TokenType::RETURN, nullptr, nullptr, Precedence::NONE);
     set(TokenType::SUPER, nullptr, nullptr, Precedence::NONE);
     set(TokenType::THIS, nullptr, nullptr, Precedence::NONE);
-    set(TokenType::TRUE, nullptr, nullptr, Precedence::NONE);
+    set(TokenType::TRUE, &Compiler::literal, nullptr, Precedence::NONE);
     set(TokenType::VAR, nullptr, nullptr, Precedence::NONE);
     set(TokenType::WHILE, nullptr, nullptr, Precedence::NONE);
     set(TokenType::ERROR, nullptr, nullptr, Precedence::NONE);

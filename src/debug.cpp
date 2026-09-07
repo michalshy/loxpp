@@ -30,7 +30,8 @@ size_t constant_instr(std::string_view name, Chunk& chunk, size_t offset,
     std::print("    {} {:4d}", name, idx); // chunk header
 
     value val = chunk.constant(idx);
-    std::println("  '{}'", val);
+    PrintVal(val);
+    std::println();
 
     u8 additional = instruction == OpCode::CONSTANT ? 2 : 4;
     return offset + additional;
@@ -64,6 +65,15 @@ u64 disassemble(Chunk& chunk, size_t offset) {
     case OpCode::CONSTANT_LONG:
         return internal::constant_instr("CONSTANT_LONG", chunk, offset,
                                         instruction);
+    case OpCode::FALSE:
+        return internal::simple_instr("FALSE", offset);
+        break;
+    case OpCode::TRUE:
+        return internal::simple_instr("TRUE", offset);
+        break;
+    case OpCode::NIL:
+        return internal::simple_instr("NIL", offset);
+        break;
     case OpCode::NEGATE:
         return internal::simple_instr("NEGATE", offset);
     case OpCode::ADD:

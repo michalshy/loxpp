@@ -5,7 +5,7 @@
 #include <format>
 #include <string_view>
 
-constexpr u8 TOKEN_COUNT = 39;
+constexpr u8 TOKEN_COUNT = 40;
 
 enum class TokenType {
     // Single-character tokens.

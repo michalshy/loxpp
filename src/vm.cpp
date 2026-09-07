@@ -1,10 +1,11 @@
 #include "vm.h"
 #include "chunk.h"
-#include "debug.h"
 #include "opcode.h"
+#include "value.h"
 #include <expected>
 #include <print>
 #include <string_view>
+#include <variant>
 
 std::expected<void, InterpretError> VM::interpret(std::string_view source) {
     Chunk chunk{};
@@ -36,7 +37,8 @@ std::expected<void, InterpretError> VM::run() {
         OpCode instruction = static_cast<OpCode>(curr_chunk->byte(ip++));
         switch (instruction) {
         case OpCode::RETURN:
-            std::println("{}", pop_stack());
+            PrintVal(pop_stack());
+            std::println();
             return {};
         case OpCode::CONSTANT: {
             size_t idx = detail::constant_idx(*curr_chunk, ip, instruction);
@@ -50,6 +52,15 @@ std::expected<void, InterpretError> VM::run() {
             ip += 3;
             break;
         }
+        case OpCode::FALSE:
+            stack.push(false);
+            break;
+        case OpCode::TRUE:
+            stack.push(true);
+            break;
+        case OpCode::NIL:
+            stack.push(std::monostate());
+            break;
         case OpCode::ADD:
             binary(std::plus<>{});
             break;
@@ -63,7 +74,10 @@ std::expected<void, InterpretError> VM::run() {
             binary(std::divides<>{});
             break;
         case OpCode::NEGATE: {
-            stack.top() = stack.top() * -1;
+            if (!std::holds_alternative<double>(stack.top())) {
+                return std::unexpected(InterpretError::RUNTIME_ERROR);
+            }
+            stack.top() = std::get<double>(stack.top()) * -1;
             break;
         }
         default:

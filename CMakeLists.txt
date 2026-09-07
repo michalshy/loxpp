@@ -54,7 +54,6 @@ add_library(loxpp_core
     src/value.h
     src/value.cpp
     src/line.h
-    src/line.cpp
     src/vm.cpp
     src/vm.h
     src/opcode.h

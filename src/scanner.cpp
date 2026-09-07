@@ -160,6 +160,7 @@ bool Scanner::match(char check) {
     if (source[current] != check)
         return false;
 
+    current++;
     return true;
 }
 

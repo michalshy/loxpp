@@ -7,9 +7,12 @@
 #include "opcode.h"
 #include "value.h"
 #include <expected>
+#include <format>
 #include <memory>
+#include <print>
 #include <stack>
 #include <string_view>
+#include <variant>
 
 enum class InterpretError {
     COMPILE_ERROR,
@@ -40,10 +43,24 @@ class VM {
 
     value pop_stack();
 
+    template <typename... Args>
+    void runtime_error(std::format_string<Args...> fmt, Args&&... args) {
+        std::string message = std::format(fmt, std::forward<Args>(args)...);
+        i64 line = curr_chunk->get_line(ip - 1);
+        std::print("{} [line {}]", message, line);
+        stack = {};
+    }
+
     template <BinaryOp Op> void binary(Op op) {
+
         value a = pop_stack();
         value b = pop_stack();
-        stack.push(op(a, b));
+        if (!std::holds_alternative<double>(a) ||
+            !std::holds_alternative<double>(b)) {
+            runtime_error("Operands must be numbers.");
+            return;
+        }
+        stack.push(op(std::get<double>(a), std::get<double>(b)));
     }
 };
 

@@ -2,9 +2,25 @@
 #define value_h
 
 #include "common.h"
+#include <print>
+#include <variant>
 #include <vector>
 
-using value = double;
+template <class... Ts> struct overloaded : Ts... {
+    using Ts::operator()...;
+};
+template <class... Ts> overloaded(Ts...) -> overloaded<Ts...>;
+
+using value = std::variant<std::monostate, bool, double>;
+
+static inline void PrintVal(const value& v) {
+    std::visit(overloaded{
+                   [](std::monostate) { std::print("nil"); },
+                   [](bool b) { std::print("{}", b ? "true" : "false"); },
+                   [](double d) { std::print("{}", d); },
+               },
+               v);
+}
 
 class Values {
     std::vector<value> values{};
