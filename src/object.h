@@ -15,7 +15,8 @@ class StringObject : public Object {
     std::string str;
 
   public:
-    explicit StringObject(std::string_view str) : str(str) {}
+    explicit StringObject(std::string_view _str)
+        : str(_str.substr(1, _str.size() - 2)) {}
     void print() override;
     [[nodiscard]] std::string_view value() { return str; }
 };

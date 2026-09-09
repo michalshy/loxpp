@@ -4,6 +4,7 @@
 #include "chunk.h"
 #include "compiler.h"
 #include "concepts.h"
+#include "object.h"
 #include "opcode.h"
 #include "value.h"
 #include <expected>
@@ -51,16 +52,24 @@ class VM {
         stack = {};
     }
 
-    template <BinaryOp Op> void binary(Op op) {
+    template <BinaryOp Op>
+    void binary(Op op) {
 
         value a = pop_stack();
         value b = pop_stack();
-        if (!std::holds_alternative<double>(a) ||
-            !std::holds_alternative<double>(b)) {
-            runtime_error("Operands must be numbers.");
+        if (std::holds_alternative<double>(a) ||
+            std::holds_alternative<double>(b)) {
+            stack.push(op(std::get<double>(a), std::get<double>(b)));
             return;
         }
-        stack.push(op(std::get<double>(a), std::get<double>(b)));
+
+        if (std::holds_alternative<Object*>(a) ||
+            std::holds_alternative<Object*>(b)) {
+            stack.push(op(std::get<double>(a), std::get<double>(b)));
+            return;
+        }
+
+        runtime_error("Operands must be numbers.");
     }
 };
 

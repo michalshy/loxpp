@@ -1,5 +1,6 @@
 #include "vm.h"
 #include "chunk.h"
+#include "object.h"
 #include "opcode.h"
 #include "value.h"
 #include <expected>
@@ -75,11 +76,10 @@ std::expected<void, InterpretError> VM::run() {
             binary(std::divides<>{});
             break;
         case OpCode::NOT:
-            std::visit(overloaded{
-                           [&](std::monostate) { return; },
-                           [&](bool b) { stack.push(!b); },
-                           [&](double) { return; },
-                       },
+            std::visit(overloaded{[&](std::monostate) { return; },
+                                  [&](bool b) { stack.push(!b); },
+                                  [&](double) { return; },
+                                  [&](Object*) { return; }},
                        pop_stack());
             break;
         case OpCode::NEGATE: {
