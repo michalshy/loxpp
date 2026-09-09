@@ -1,5 +1,6 @@
 #include "compiler.h"
 #include "debug.h"
+#include "object.h"
 #include "opcode.h"
 #include "precedence.h"
 #include "rule.h"
@@ -76,6 +77,8 @@ void Compiler::unary() {
     parse_precedence(Precedence::UNARY);
     if (op == TokenType::MINUS) {
         emit_byte(std::to_underlying(OpCode::NEGATE));
+    } else if (op == TokenType::BANG) {
+        emit_byte(std::to_underlying(OpCode::NOT));
     }
 }
 
@@ -94,6 +97,21 @@ void Compiler::binary() {
         emit_byte(std::to_underlying(OpCode::MULTIPLY));
     } else if (op_type == TokenType::SLASH) {
         emit_byte(std::to_underlying(OpCode::DIVIDE));
+    } else if (op_type == TokenType::BANG_EQUAL) {
+        emit_bytes(std::to_underlying(OpCode::EQUAL),
+                   std::to_underlying(OpCode::NOT));
+    } else if (op_type == TokenType::EQUAL) {
+        emit_byte(std::to_underlying(OpCode::EQUAL));
+    } else if (op_type == TokenType::GREATER) {
+        emit_byte(std::to_underlying(OpCode::GREATER));
+    } else if (op_type == TokenType::GREATER_EQUAL) {
+        emit_bytes(std::to_underlying(OpCode::GREATER),
+                   std::to_underlying(OpCode::NOT));
+    } else if (op_type == TokenType::LESS) {
+        emit_byte(std::to_underlying(OpCode::LESS));
+    } else if (op_type == TokenType::LESS_EQUAL) {
+        emit_bytes(std::to_underlying(OpCode::LESS),
+                   std::to_underlying(OpCode::NOT));
     }
 }
 
@@ -105,6 +123,11 @@ void Compiler::literal() {
     } else if (parser->prev.type == TokenType::NIL) {
         emit_byte(std::to_underlying(OpCode::NIL));
     }
+}
+
+void Compiler::string() {
+    StringObject* obj = allocate_object<StringObject>(parser->prev.token);
+    emit_const(obj);
 }
 
 Chunk* Compiler::current() { return compilation_chunk; }
@@ -216,7 +239,7 @@ Compiler::make_rules() {
     set(TokenType::LESS_EQUAL, nullptr, &Compiler::binary,
         Precedence::COMPARISON);
     set(TokenType::IDENTIFIER, nullptr, nullptr, Precedence::NONE);
-    set(TokenType::STRING, nullptr, nullptr, Precedence::NONE);
+    set(TokenType::STRING, &Compiler::string, nullptr, Precedence::NONE);
     set(TokenType::NUMBER, &Compiler::number, nullptr, Precedence::NONE);
     set(TokenType::AND, nullptr, nullptr, Precedence::AND);
     set(TokenType::CLASS, nullptr, nullptr, Precedence::NONE);

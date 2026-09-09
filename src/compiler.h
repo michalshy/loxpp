@@ -38,6 +38,7 @@ class Compiler {
     void unary();
     void binary();
     void literal();
+    void string();
 
     Chunk* current();
     void emit_byte(u8 byte);

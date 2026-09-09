@@ -84,6 +84,14 @@ u64 disassemble(Chunk& chunk, size_t offset) {
         return internal::simple_instr("MULTIPLY", offset);
     case OpCode::DIVIDE:
         return internal::simple_instr("DIVIDE", offset);
+    case OpCode::NOT:
+        return internal::simple_instr("NOT", offset);
+    case OpCode::EQUAL:
+        return internal::simple_instr("EQUAL", offset);
+    case OpCode::LESS:
+        return internal::simple_instr("LESS", offset);
+    case OpCode::GREATER:
+        return internal::simple_instr("GREATER", offset);
 
     default:
         std::println("Unknown opcode {:d}", raw);

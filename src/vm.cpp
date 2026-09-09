@@ -5,6 +5,7 @@
 #include <expected>
 #include <print>
 #include <string_view>
+#include <type_traits>
 #include <variant>
 
 std::expected<void, InterpretError> VM::interpret(std::string_view source) {
@@ -73,11 +74,41 @@ std::expected<void, InterpretError> VM::run() {
         case OpCode::DIVIDE:
             binary(std::divides<>{});
             break;
+        case OpCode::NOT:
+            std::visit(overloaded{
+                           [&](std::monostate) { return; },
+                           [&](bool b) { stack.push(!b); },
+                           [&](double) { return; },
+                       },
+                       pop_stack());
+            break;
         case OpCode::NEGATE: {
             if (!std::holds_alternative<double>(stack.top())) {
                 return std::unexpected(InterpretError::RUNTIME_ERROR);
             }
             stack.top() = std::get<double>(stack.top()) * -1;
+            break;
+        }
+        case OpCode::EQUAL: {
+            value a = pop_stack();
+            value b = pop_stack();
+            stack.push(a == b);
+            break;
+        }
+        case OpCode::LESS: {
+            value a = pop_stack();
+            value b = pop_stack();
+            stack.push(std::is_same_v<std::decay_t<decltype(a)>,
+                                      std::decay_t<decltype(a)>> &&
+                       a > b);
+            break;
+        }
+        case OpCode::GREATER: {
+            value a = pop_stack();
+            value b = pop_stack();
+            stack.push(std::is_same_v<std::decay_t<decltype(a)>,
+                                      std::decay_t<decltype(a)>> &&
+                       a < b);
             break;
         }
         default:

@@ -2,6 +2,8 @@
 #define value_h
 
 #include "common.h"
+#include "object.h"
+#include <memory>
 #include <print>
 #include <variant>
 #include <vector>
@@ -11,13 +13,14 @@ template <class... Ts> struct overloaded : Ts... {
 };
 template <class... Ts> overloaded(Ts...) -> overloaded<Ts...>;
 
-using value = std::variant<std::monostate, bool, double>;
+using value = std::variant<std::monostate, bool, double, Object*>;
 
 static inline void PrintVal(const value& v) {
     std::visit(overloaded{
                    [](std::monostate) { std::print("nil"); },
                    [](bool b) { std::print("{}", b ? "true" : "false"); },
                    [](double d) { std::print("{}", d); },
+
                },
                v);
 }
