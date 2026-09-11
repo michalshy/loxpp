@@ -126,7 +126,9 @@ void Compiler::literal() {
 }
 
 void Compiler::string() {
-    StringObject* obj = allocate_object<StringObject>(parser->prev.token);
+    std::string text = std::string(
+        parser->prev.token.substr(1, parser->prev.token.size() - 2));
+    StringObject* obj = allocate_object<StringObject>(std::move(text));
     emit_const(obj);
 }
 

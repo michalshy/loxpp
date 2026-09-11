@@ -2,23 +2,32 @@
 #define object_h
 
 #include <string>
-#include <string_view>
 #include <utility>
 
+enum class ObjectType { STRING };
+
 class Object {
+    ObjectType type;
+
   public:
     virtual ~Object() = default;
     virtual void print() = 0;
+
+    bool IsType(ObjectType checked) { return type == checked; }
+
+  protected:
+    explicit Object(ObjectType type) : type(type) {}
 };
 
 class StringObject : public Object {
     std::string str;
 
   public:
-    explicit StringObject(std::string_view _str)
-        : str(_str.substr(1, _str.size() - 2)) {}
+    explicit StringObject(std::string _str)
+        : Object(ObjectType::STRING), str(std::move(_str)) {}
+
     void print() override;
-    [[nodiscard]] std::string_view value() { return str; }
+    [[nodiscard]] const std::string& value() const { return str; }
 };
 
 template <typename T, typename... Args>

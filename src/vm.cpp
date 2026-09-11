@@ -64,16 +64,16 @@ std::expected<void, InterpretError> VM::run() {
             stack.push(std::monostate());
             break;
         case OpCode::ADD:
-            binary(std::plus<>{});
+            add();
             break;
         case OpCode::SUBTRACT:
-            binary(std::minus<>{});
+            subtract();
             break;
         case OpCode::MULTIPLY:
-            binary(std::multiplies<>{});
+            multiply();
             break;
         case OpCode::DIVIDE:
-            binary(std::divides<>{});
+            divide();
             break;
         case OpCode::NOT:
             std::visit(overloaded{[&](std::monostate) { return; },
@@ -125,7 +125,58 @@ value VM::pop_stack() {
     return v;
 }
 
+void VM::add() {
+    value a = pop_stack();
+    value b = pop_stack();
+
+    if (std::holds_alternative<double>(a) &&
+        std::holds_alternative<double>(b)) {
+        stack.push(std::get<double>(b) + std::get<double>(a));
+    }
+
+    if (std::holds_alternative<Object*>(a) &&
+        std::holds_alternative<Object*>(b) &&
+        std::get<Object*>(a)->IsType(ObjectType::STRING) &&
+        std::get<Object*>(b)->IsType(ObjectType::STRING)) {
+        StringObject* a_str = static_cast<StringObject*>(std::get<Object*>(a));
+        StringObject* b_str = static_cast<StringObject*>(std::get<Object*>(b));
+        stack.push(
+            allocate_object<StringObject>(b_str->value() + a_str->value()));
+    }
+}
+
+void VM::subtract() {
+    value a = pop_stack();
+    value b = pop_stack();
+
+    if (std::holds_alternative<double>(a) &&
+        std::holds_alternative<double>(b)) {
+        stack.push(std::get<double>(b) - std::get<double>(a));
+    }
+}
+
+void VM::divide() {
+    value a = pop_stack();
+    value b = pop_stack();
+
+    if (std::holds_alternative<double>(a) &&
+        std::holds_alternative<double>(b)) {
+        stack.push(std::get<double>(b) / std::get<double>(a));
+    }
+}
+
+void VM::multiply() {
+    value a = pop_stack();
+    value b = pop_stack();
+
+    if (std::holds_alternative<double>(a) &&
+        std::holds_alternative<double>(b)) {
+        stack.push(std::get<double>(b) * std::get<double>(a));
+    }
+}
+
 namespace detail {
+
 size_t constant_idx(Chunk& chunk, size_t offset, OpCode opcode) {
     if (opcode == OpCode::CONSTANT) {
         return static_cast<size_t>(chunk.byte(offset));
