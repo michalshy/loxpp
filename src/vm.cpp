@@ -1,5 +1,6 @@
 #include "vm.h"
 #include "chunk.h"
+#include "memory.h"
 #include "object.h"
 #include "opcode.h"
 #include "value.h"
@@ -8,6 +9,8 @@
 #include <string_view>
 #include <type_traits>
 #include <variant>
+
+VM::~VM() { free_objects(objects); }
 
 std::expected<void, InterpretError> VM::interpret(std::string_view source) {
     Chunk chunk{};

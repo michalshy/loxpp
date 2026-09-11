@@ -21,6 +21,8 @@ class VM {
     Chunk* curr_chunk{nullptr};
     size_t ip{0};
 
+    Object* objects;
+
     std::stack<value> stack{};
 
     std::unique_ptr<Compiler> compiler{};
@@ -30,8 +32,12 @@ class VM {
         static VM v;
         return v;
     }
+    ~VM();
 
     std::expected<void, InterpretError> interpret(std::string_view source);
+
+    void set_objects(Object* obj) { objects = obj; }
+    Object* get_objects() { return objects; }
 
   private:
     VM() : compiler(std::make_unique<Compiler>()) {}
@@ -54,6 +60,17 @@ class VM {
     void divide();
     void multiply();
 };
+
+template <typename T>
+concept IsObject = std::is_base_of_v<Object, T>;
+
+template <IsObject T, typename... Args>
+T* allocate_object(Args&&... args) {
+    T* object = new T(std::forward<Args>(args)...);
+    object->set_next(VM::Instance().get_objects());
+    VM::Instance().set_objects(object);
+    return object;
+}
 
 namespace detail {
 size_t constant_idx(Chunk&, size_t, OpCode);

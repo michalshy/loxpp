@@ -8,12 +8,16 @@ enum class ObjectType { STRING };
 
 class Object {
     ObjectType type;
+    Object* next;
 
   public:
     virtual ~Object() = default;
     virtual void print() = 0;
 
     bool IsType(ObjectType checked) { return type == checked; }
+
+    void set_next(Object* obj) { next = obj; }
+    Object* get_next() { return next; }
 
   protected:
     explicit Object(ObjectType type) : type(type) {}
@@ -29,10 +33,5 @@ class StringObject : public Object {
     void print() override;
     [[nodiscard]] const std::string& value() const { return str; }
 };
-
-template <typename T, typename... Args>
-T* allocate_object(Args&&... args) {
-    return new T(std::forward<Args>(args)...);
-}
 
 #endif

@@ -6,6 +6,7 @@
 #include "rule.h"
 #include "token.h"
 #include "value.h"
+#include "vm.h"
 #include <cstddef>
 #include <print>
 #include <string>
