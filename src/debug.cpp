@@ -94,6 +94,8 @@ u64 disassemble(Chunk& chunk, size_t offset) {
         return internal::simple_instr("GREATER", offset);
     case OpCode::PRINT:
         return internal::simple_instr("PRINT", offset);
+    case OpCode::POP:
+        return internal::simple_instr("POP", offset);
 
     default:
         std::println("Unknown opcode {:d}", raw);

@@ -114,9 +114,12 @@ std::expected<void, InterpretError> VM::run() {
         }
         case OpCode::PRINT: {
             PrintVal(pop_stack());
-            std::print("\n");
+            std::println();
             break;
         }
+        case OpCode::POP:
+            pop_stack();
+            break;
         default:
             break;
         }
@@ -138,6 +141,7 @@ void VM::add() {
     if (std::holds_alternative<double>(a) &&
         std::holds_alternative<double>(b)) {
         stack.push(std::get<double>(b) + std::get<double>(a));
+        return;
     }
 
     if (std::holds_alternative<Object*>(a) &&
@@ -147,8 +151,11 @@ void VM::add() {
         StringObject* a_str = static_cast<StringObject*>(std::get<Object*>(a));
         StringObject* b_str = static_cast<StringObject*>(std::get<Object*>(b));
         stack.push(
-            allocate_object<StringObject>(b_str->value() + a_str->value()));
+            allocate_object<StringObject>(b_str->value(), a_str->value()));
+        return;
     }
+
+    runtime_error("Operands must be string or number.");
 }
 
 void VM::subtract() {

@@ -46,11 +46,77 @@ void Compiler::advance() {
     }
 }
 
-void Compiler::declaration() { statement(); }
+void Compiler::declaration() {
+    if (match(TokenType::VAR)) {
+        var_declaration();
+    } else {
+        statement();
+    }
+    if (parser->panic) {
+        synchronize();
+    }
+}
 
 void Compiler::statement() {
     if (match(TokenType::PRINT)) {
         print();
+    }
+}
+
+void Compiler::synchronize() {
+    parser->panic = false;
+
+    while (parser->curr.type != TokenType::LOX_EOF) {
+        if (parser->prev.type == TokenType::SEMICOLON)
+            return;
+
+        switch (parser->curr.type) {
+        case TokenType::CLASS:
+        case TokenType::FOR:
+        case TokenType::VAR:
+        case TokenType::FUN:
+        case TokenType::IF:
+        case TokenType::PRINT:
+        case TokenType::RETURN:
+        case TokenType::WHILE:
+            return;
+
+        case TokenType::LEFT_PAREN:
+        case TokenType::RIGHT_PAREN:
+        case TokenType::LEFT_BRACE:
+        case TokenType::RIGHT_BRACE:
+        case TokenType::COMMA:
+        case TokenType::DOT:
+        case TokenType::MINUS:
+        case TokenType::PLUS:
+        case TokenType::SEMICOLON:
+        case TokenType::SLASH:
+        case TokenType::STAR:
+        case TokenType::BANG:
+        case TokenType::BANG_EQUAL:
+        case TokenType::EQUAL:
+        case TokenType::EQUAL_EQUAL:
+        case TokenType::GREATER:
+        case TokenType::GREATER_EQUAL:
+        case TokenType::LESS:
+        case TokenType::LESS_EQUAL:
+        case TokenType::IDENTIFIER:
+        case TokenType::STRING:
+        case TokenType::NUMBER:
+        case TokenType::AND:
+        case TokenType::ELSE:
+        case TokenType::FALSE:
+        case TokenType::NIL:
+        case TokenType::OR:
+        case TokenType::SUPER:
+        case TokenType::THIS:
+        case TokenType::TRUE:
+        case TokenType::ERROR:
+        case TokenType::LOX_EOF:
+        default:
+            // nothing
+        }
+        advance();
     }
 }
 
@@ -74,10 +140,41 @@ void Compiler::end() {
 #endif
 }
 
+void Compiler::var_declaration() {
+    u8 global_var = parse_var("Expected variable name.");
+
+    if (match(TokenType::EQUAL)) {
+        expression();
+    } else {
+        emit_byte(std::to_underlying(OpCode::NIL));
+    }
+
+    consume(TokenType::SEMICOLON, "Expected ; after var declaration.");
+
+    define_var(global_var);
+}
+
+u8 Compiler::parse_var(std::string_view error_msg) {
+    consume(TokenType::IDENTIFIER, error_msg);
+    return id_constant(parser->prev.token);
+}
+
+u8 Compiler::id_constant(std::string_view token) {
+    return constant(allocate_object<StringObject>(std::string(token)));
+}
+
+void Compiler::define_var(u8 var) {}
+
 void Compiler::print() {
     expression();
     consume(TokenType::SEMICOLON, "Expected ; after expression.");
     emit_byte(std::to_underlying(OpCode::PRINT));
+}
+
+void Compiler::expression_internal() {
+    expression();
+    consume(TokenType::SEMICOLON, "Expected ; after expression.");
+    emit_byte(std::to_underlying(OpCode::POP));
 }
 
 void Compiler::number() {
@@ -144,9 +241,8 @@ void Compiler::literal() {
 }
 
 void Compiler::string() {
-    std::string text = std::string(
-        parser->prev.token.substr(1, parser->prev.token.size() - 2));
-    StringObject* obj = allocate_object<StringObject>(std::move(text));
+    StringObject* obj =
+        allocate_object<StringObject>(std::string(parser->prev.token));
     emit_const(obj);
 }
 

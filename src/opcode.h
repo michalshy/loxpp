@@ -19,6 +19,7 @@ enum class OpCode : u8 {
     NOT,
     NEGATE,
     PRINT,
+    POP,
     RETURN,
 };
 

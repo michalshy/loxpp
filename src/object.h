@@ -2,7 +2,6 @@
 #define object_h
 
 #include <string>
-#include <utility>
 
 enum class ObjectType { STRING };
 
@@ -28,7 +27,10 @@ class StringObject : public Object {
 
   public:
     explicit StringObject(std::string _str)
-        : Object(ObjectType::STRING), str(std::move(_str)) {}
+        : Object(ObjectType::STRING), str(_str.substr(1, _str.size() - 2)) {}
+
+    StringObject(std::string a, std::string b)
+        : Object(ObjectType::STRING), str(a + b) {}
 
     void print() override;
     [[nodiscard]] const std::string& value() const { return str; }

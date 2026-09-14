@@ -31,11 +31,18 @@ class Compiler {
     void advance();
     void declaration();
     void statement();
+    void synchronize();
     void expression();
     void consume(TokenType type, std::string_view message);
     void end();
 
+    void var_declaration();
+    u8 parse_var(std::string_view error_msg);
+    u8 id_constant(std::string_view token);
+    void define_var(u8 var);
+
     void print();
+    void expression_internal();
 
     void number();
     void grouping();
