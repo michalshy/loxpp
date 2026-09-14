@@ -29,9 +29,13 @@ class Compiler {
 
   private:
     void advance();
+    void declaration();
+    void statement();
     void expression();
     void consume(TokenType type, std::string_view message);
     void end();
+
+    void print();
 
     void number();
     void grouping();
@@ -49,6 +53,9 @@ class Compiler {
     u8 constant(value val);
 
     void parse_precedence(Precedence precedence);
+
+    bool match(TokenType type);
+    bool check(TokenType type);
 
     void error_at_current(std::string_view message);
     void error(std::string_view message);

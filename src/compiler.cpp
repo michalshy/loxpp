@@ -23,8 +23,11 @@ bool Compiler::compile(std::string_view source, Chunk& chunk) {
     parser->panic = false;
 
     advance();
-    expression();
-    consume(TokenType::LOX_EOF, "Expected end of expression.");
+
+    while (!match(TokenType::LOX_EOF)) {
+        declaration();
+    }
+
     end();
     return !parser->had_error;
 }
@@ -40,6 +43,14 @@ void Compiler::advance() {
         } else {
             error_at_current(parser->curr.token);
         }
+    }
+}
+
+void Compiler::declaration() { statement(); }
+
+void Compiler::statement() {
+    if (match(TokenType::PRINT)) {
+        print();
     }
 }
 
@@ -61,6 +72,12 @@ void Compiler::end() {
         debug::disassemble(*current(), "code");
     }
 #endif
+}
+
+void Compiler::print() {
+    expression();
+    consume(TokenType::SEMICOLON, "Expected ; after expression.");
+    emit_byte(std::to_underlying(OpCode::PRINT));
 }
 
 void Compiler::number() {
@@ -178,6 +195,18 @@ void Compiler::parse_precedence(Precedence precedence) {
             (this->*infix_rule)();
         }
     }
+}
+
+bool Compiler::match(TokenType type) {
+    if (!check(type)) {
+        return false;
+    }
+    advance();
+    return true;
+}
+
+bool Compiler::check(TokenType type) {
+    return parser->curr.type == type ? true : false;
 }
 
 void Compiler::error_at_current(std::string_view message) {

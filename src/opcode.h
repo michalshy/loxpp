@@ -18,6 +18,7 @@ enum class OpCode : u8 {
     DIVIDE,
     NOT,
     NEGATE,
+    PRINT,
     RETURN,
 };
 

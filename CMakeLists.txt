@@ -49,6 +49,7 @@ add_library(loxpp_core
     src/chunk.h
     src/chunk.cpp
     src/memory.h
+    src/memory.cpp
     src/debug.cpp
     src/debug.h
     src/value.h

@@ -42,8 +42,6 @@ std::expected<void, InterpretError> VM::run() {
         OpCode instruction = static_cast<OpCode>(curr_chunk->byte(ip++));
         switch (instruction) {
         case OpCode::RETURN:
-            PrintVal(pop_stack());
-            std::println();
             return {};
         case OpCode::CONSTANT: {
             size_t idx = detail::constant_idx(*curr_chunk, ip, instruction);
@@ -112,6 +110,11 @@ std::expected<void, InterpretError> VM::run() {
             stack.push(std::is_same_v<std::decay_t<decltype(a)>,
                                       std::decay_t<decltype(a)>> &&
                        a < b);
+            break;
+        }
+        case OpCode::PRINT: {
+            PrintVal(pop_stack());
+            std::print("\n");
             break;
         }
         default:
