@@ -44,15 +44,9 @@ std::expected<void, InterpretError> VM::run() {
         case OpCode::RETURN:
             return {};
         case OpCode::CONSTANT: {
-            size_t idx = detail::constant_idx(*curr_chunk, ip, instruction);
+            size_t idx = detail::constant_idx(*curr_chunk, ip);
             stack.push(curr_chunk->constant(idx));
             ip++;
-            break;
-        }
-        case OpCode::CONSTANT_LONG: {
-            size_t idx = detail::constant_idx(*curr_chunk, ip, instruction);
-            stack.push(curr_chunk->constant(idx));
-            ip += 3;
             break;
         }
         case OpCode::FALSE:
@@ -120,6 +114,32 @@ std::expected<void, InterpretError> VM::run() {
         case OpCode::POP:
             pop_stack();
             break;
+        case OpCode::DEFINE_GLOBAL: {
+            size_t idx = detail::constant_idx(*curr_chunk, ip);
+            value val = curr_chunk->constant(idx);
+            StringObject* name =
+                static_cast<StringObject*>(std::get<Object*>(val));
+
+            globals[name->value()] = stack.top();
+            pop_stack();
+            ip++;
+            break;
+        }
+        case OpCode::GET_GLOBAL: {
+            size_t idx = detail::constant_idx(*curr_chunk, ip);
+            ip++;
+            value val = curr_chunk->constant(idx);
+            StringObject* name =
+                static_cast<StringObject*>(std::get<Object*>(val));
+
+            auto it = globals.find(name->value());
+            if (it == globals.end()) {
+                runtime_error("Undefined variable '{}'.", name->value());
+                return std::unexpected(InterpretError::RUNTIME_ERROR);
+            }
+            stack.push(it->second);
+            break;
+        }
         default:
             break;
         }
@@ -190,13 +210,7 @@ void VM::multiply() {
 
 namespace detail {
 
-size_t constant_idx(Chunk& chunk, size_t offset, OpCode opcode) {
-    if (opcode == OpCode::CONSTANT) {
-        return static_cast<size_t>(chunk.byte(offset));
-    } else {
-        return static_cast<size_t>(chunk.byte(offset + 2) << 16 |
-                                   chunk.byte(offset + 1) << 8 |
-                                   chunk.byte(offset));
-    }
+size_t constant_idx(Chunk& chunk, size_t offset) {
+    return static_cast<size_t>(chunk.byte(offset));
 }
 } // namespace detail

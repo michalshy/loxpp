@@ -5,7 +5,6 @@
 
 enum class OpCode : u8 {
     CONSTANT,
-    CONSTANT_LONG,
     NIL,
     TRUE,
     FALSE,
@@ -20,6 +19,8 @@ enum class OpCode : u8 {
     NEGATE,
     PRINT,
     POP,
+    DEFINE_GLOBAL,
+    GET_GLOBAL,
     RETURN,
 };
 

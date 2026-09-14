@@ -3,7 +3,6 @@
 #include "memory.h"
 #include "opcode.h"
 #include "value.h"
-#include <cstdint>
 #include <unistd.h>
 #include <utility>
 
@@ -11,15 +10,8 @@ Chunk::Chunk() : code(), constants() { code.reserve(BASE_CHUNK_CAPACITY); }
 
 void Chunk::write_constant(value val, u64 line) {
     size_t idx = add_constant(val);
-    if (idx <= UINT8_MAX) {
-        write(std::to_underlying(OpCode::CONSTANT), line);
-        write(static_cast<u8>(idx), line);
-    } else {
-        write(std::to_underlying(OpCode::CONSTANT_LONG), line);
-        write(static_cast<u8>(idx & 0xFF), line);
-        write(static_cast<u8>(idx >> 8 & 0xFF), line);
-        write(static_cast<u8>(idx >> 16 & 0xFF), line);
-    }
+    write(std::to_underlying(OpCode::CONSTANT), line);
+    write(static_cast<u8>(idx), line);
 }
 
 void Chunk::write(const u8& byte, u64 line) {

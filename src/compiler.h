@@ -38,7 +38,7 @@ class Compiler {
 
     void var_declaration();
     u8 parse_var(std::string_view error_msg);
-    u8 id_constant(std::string_view token);
+    u8 id_constant(Token token);
     void define_var(u8 var);
 
     void print();
@@ -50,6 +50,9 @@ class Compiler {
     void binary();
     void literal();
     void string();
+    void variable();
+
+    void named_variable(Token token);
 
     Chunk* current();
     void emit_byte(u8 byte);

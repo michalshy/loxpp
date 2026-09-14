@@ -3,14 +3,18 @@
 
 #include "chunk.h"
 #include "compiler.h"
+#include "object.h"
 #include "opcode.h"
 #include "value.h"
+#include <cstddef>
 #include <expected>
 #include <format>
 #include <memory>
 #include <print>
 #include <stack>
+#include <string>
 #include <string_view>
+#include <unordered_map>
 
 enum class InterpretError {
     COMPILE_ERROR,
@@ -21,9 +25,10 @@ class VM {
     Chunk* curr_chunk{nullptr};
     size_t ip{0};
 
-    Object* objects;
+    Object* objects{nullptr};
 
     std::stack<value> stack{};
+    std::unordered_map<std::string, value> globals{};
 
     std::unique_ptr<Compiler> compiler{};
 
@@ -73,7 +78,7 @@ T* allocate_object(Args&&... args) {
 }
 
 namespace detail {
-size_t constant_idx(Chunk&, size_t, OpCode);
+size_t constant_idx(Chunk&, size_t);
 } // namespace detail
 
 #endif

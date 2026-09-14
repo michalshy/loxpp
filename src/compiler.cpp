@@ -156,14 +156,16 @@ void Compiler::var_declaration() {
 
 u8 Compiler::parse_var(std::string_view error_msg) {
     consume(TokenType::IDENTIFIER, error_msg);
-    return id_constant(parser->prev.token);
+    return id_constant(parser->prev);
 }
 
-u8 Compiler::id_constant(std::string_view token) {
-    return constant(allocate_object<StringObject>(std::string(token)));
+u8 Compiler::id_constant(Token token) {
+    return constant(allocate_object<StringObject>(std::string(token.token)));
 }
 
-void Compiler::define_var(u8 var) {}
+void Compiler::define_var(u8 var) {
+    emit_bytes(std::to_underlying(OpCode::DEFINE_GLOBAL), var);
+}
 
 void Compiler::print() {
     expression();
@@ -244,6 +246,13 @@ void Compiler::string() {
     StringObject* obj =
         allocate_object<StringObject>(std::string(parser->prev.token));
     emit_const(obj);
+}
+
+void Compiler::variable() { named_variable(parser->prev); }
+
+void Compiler::named_variable(Token token) {
+    u8 arg = id_constant(token);
+    emit_bytes(std::to_underlying(OpCode::GET_GLOBAL), arg);
 }
 
 Chunk* Compiler::current() { return compilation_chunk; }
@@ -366,7 +375,7 @@ Compiler::make_rules() {
     set(TokenType::LESS, nullptr, &Compiler::binary, Precedence::COMPARISON);
     set(TokenType::LESS_EQUAL, nullptr, &Compiler::binary,
         Precedence::COMPARISON);
-    set(TokenType::IDENTIFIER, nullptr, nullptr, Precedence::NONE);
+    set(TokenType::IDENTIFIER, &Compiler::variable, nullptr, Precedence::NONE);
     set(TokenType::STRING, &Compiler::string, nullptr, Precedence::NONE);
     set(TokenType::NUMBER, &Compiler::number, nullptr, Precedence::NONE);
     set(TokenType::AND, nullptr, nullptr, Precedence::AND);

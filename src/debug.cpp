@@ -23,9 +23,8 @@ size_t simple_instr(std::string_view name, size_t offset) {
     return offset + 1;
 }
 
-size_t constant_instr(std::string_view name, Chunk& chunk, size_t offset,
-                      OpCode instruction) {
-    size_t idx = detail::constant_idx(chunk, offset + 1, instruction);
+size_t constant_instr(std::string_view name, Chunk& chunk, size_t offset) {
+    size_t idx = detail::constant_idx(chunk, offset + 1);
 
     std::print("    {} {:4d}", name, idx); // chunk header
 
@@ -33,7 +32,7 @@ size_t constant_instr(std::string_view name, Chunk& chunk, size_t offset,
     PrintVal(val);
     std::println();
 
-    u8 additional = instruction == OpCode::CONSTANT ? 2 : 4;
+    u8 additional = 2;
     return offset + additional;
 }
 } // namespace internal
@@ -61,10 +60,7 @@ u64 disassemble(Chunk& chunk, size_t offset) {
     case OpCode::RETURN:
         return internal::simple_instr("RETURN", offset);
     case OpCode::CONSTANT:
-        return internal::constant_instr("CONSTANT", chunk, offset, instruction);
-    case OpCode::CONSTANT_LONG:
-        return internal::constant_instr("CONSTANT_LONG", chunk, offset,
-                                        instruction);
+        return internal::constant_instr("CONSTANT", chunk, offset);
     case OpCode::FALSE:
         return internal::simple_instr("FALSE", offset);
         break;
@@ -96,6 +92,10 @@ u64 disassemble(Chunk& chunk, size_t offset) {
         return internal::simple_instr("PRINT", offset);
     case OpCode::POP:
         return internal::simple_instr("POP", offset);
+    case OpCode::DEFINE_GLOBAL:
+        return internal::constant_instr("DEFINE_GLOBAL", chunk, offset);
+    case OpCode::GET_GLOBAL:
+        return internal::constant_instr("GET_GLOBAL", chunk, offset);
 
     default:
         std::println("Unknown opcode {:d}", raw);
