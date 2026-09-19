@@ -27,7 +27,7 @@ class StringObject : public Object {
 
   public:
     explicit StringObject(std::string _str)
-        : Object(ObjectType::STRING), str(_str.substr(1, _str.size() - 2)) {}
+        : Object(ObjectType::STRING), str(std::move(_str)) {}
 
     StringObject(std::string a, std::string b)
         : Object(ObjectType::STRING), str(a + b) {}

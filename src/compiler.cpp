@@ -60,6 +60,8 @@ void Compiler::declaration() {
 void Compiler::statement() {
     if (match(TokenType::PRINT)) {
         print();
+    } else {
+        expression_internal();
     }
 }
 
@@ -243,8 +245,9 @@ void Compiler::literal(bool) {
 }
 
 void Compiler::string(bool) {
-    StringObject* obj =
-        allocate_object<StringObject>(std::string(parser->prev.token));
+    std::string_view raw = parser->prev.token;
+    std::string content(raw.substr(1, raw.size() - 2));
+    StringObject* obj = allocate_object<StringObject>(std::move(content));
     emit_const(obj);
 }
 
@@ -306,7 +309,7 @@ void Compiler::parse_precedence(Precedence precedence) {
         advance();
         ParseFn infix_rule = get_rule(parser->prev.type).infix;
         if (infix_rule != nullptr) {
-            (this->*infix_rule)(false);
+            (this->*infix_rule)(can_assign);
         }
     }
 
