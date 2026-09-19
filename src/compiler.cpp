@@ -179,17 +179,17 @@ void Compiler::expression_internal() {
     emit_byte(std::to_underlying(OpCode::POP));
 }
 
-void Compiler::number() {
+void Compiler::number(bool) {
     value v = std::stod(parser->prev.token.data());
     emit_const(v);
 }
 
-void Compiler::grouping() {
+void Compiler::grouping(bool) {
     expression();
     consume(TokenType::RIGHT_PAREN, "Expect ')' after expression.");
 }
 
-void Compiler::unary() {
+void Compiler::unary(bool) {
     TokenType op = parser->prev.type;
     parse_precedence(Precedence::UNARY);
     if (op == TokenType::MINUS) {
@@ -199,7 +199,7 @@ void Compiler::unary() {
     }
 }
 
-void Compiler::binary() {
+void Compiler::binary(bool) {
     TokenType op_type = parser->prev.type;
     const ParseRule& rule = get_rule(op_type);
 
@@ -232,7 +232,7 @@ void Compiler::binary() {
     }
 }
 
-void Compiler::literal() {
+void Compiler::literal(bool) {
     if (parser->prev.type == TokenType::FALSE) {
         emit_byte(std::to_underlying(OpCode::FALSE));
     } else if (parser->prev.type == TokenType::TRUE) {
@@ -242,17 +242,25 @@ void Compiler::literal() {
     }
 }
 
-void Compiler::string() {
+void Compiler::string(bool) {
     StringObject* obj =
         allocate_object<StringObject>(std::string(parser->prev.token));
     emit_const(obj);
 }
 
-void Compiler::variable() { named_variable(parser->prev); }
+void Compiler::variable(bool can_assign) {
+    named_variable(parser->prev, can_assign);
+}
 
-void Compiler::named_variable(Token token) {
+void Compiler::named_variable(Token token, bool can_assign) {
     u8 arg = id_constant(token);
-    emit_bytes(std::to_underlying(OpCode::GET_GLOBAL), arg);
+
+    if (can_assign && match(TokenType::EQUAL)) {
+        expression();
+        emit_bytes(std::to_underlying(OpCode::SET_GLOBAL), arg);
+    } else {
+        emit_bytes(std::to_underlying(OpCode::GET_GLOBAL), arg);
+    }
 }
 
 Chunk* Compiler::current() { return compilation_chunk; }
@@ -286,19 +294,24 @@ u8 Compiler::constant(value v) {
 
 void Compiler::parse_precedence(Precedence precedence) {
     advance();
+    bool can_assign = precedence <= Precedence::ASSIGNMENT;
     ParseFn prefix_rule = get_rule(parser->prev.type).prefix;
     if (prefix_rule == nullptr) {
         error("Expected expression.");
     } else {
-        (this->*prefix_rule)();
+        (this->*prefix_rule)(can_assign);
     }
 
     while (precedence <= get_rule(parser->curr.type).precedence) {
         advance();
         ParseFn infix_rule = get_rule(parser->prev.type).infix;
         if (infix_rule != nullptr) {
-            (this->*infix_rule)();
+            (this->*infix_rule)(false);
         }
+    }
+
+    if (can_assign && match(TokenType::EQUAL)) {
+        error("Invalid assignment target.");
     }
 }
 

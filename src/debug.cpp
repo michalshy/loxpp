@@ -94,6 +94,8 @@ u64 disassemble(Chunk& chunk, size_t offset) {
         return internal::simple_instr("POP", offset);
     case OpCode::DEFINE_GLOBAL:
         return internal::constant_instr("DEFINE_GLOBAL", chunk, offset);
+    case OpCode::SET_GLOBAL:
+        return internal::constant_instr("SET_GLOBAL", chunk, offset);
     case OpCode::GET_GLOBAL:
         return internal::constant_instr("GET_GLOBAL", chunk, offset);
 

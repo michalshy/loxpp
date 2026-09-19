@@ -125,6 +125,21 @@ std::expected<void, InterpretError> VM::run() {
             ip++;
             break;
         }
+        case OpCode::SET_GLOBAL: {
+            size_t idx = detail::constant_idx(*curr_chunk, ip);
+            ip++;
+            value val = curr_chunk->constant(idx);
+            StringObject* name =
+                static_cast<StringObject*>(std::get<Object*>(val));
+
+            auto it = globals.find(name->value());
+            if (it == globals.end()) {
+                runtime_error("Undefined variable '{}'.", name->value());
+                return std::unexpected(InterpretError::RUNTIME_ERROR);
+            }
+            it->second = stack.top();
+            break;
+        }
         case OpCode::GET_GLOBAL: {
             size_t idx = detail::constant_idx(*curr_chunk, ip);
             ip++;

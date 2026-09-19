@@ -44,15 +44,15 @@ class Compiler {
     void print();
     void expression_internal();
 
-    void number();
-    void grouping();
-    void unary();
-    void binary();
-    void literal();
-    void string();
-    void variable();
+    void number(bool);
+    void grouping(bool);
+    void unary(bool);
+    void binary(bool);
+    void literal(bool);
+    void string(bool);
+    void variable(bool);
 
-    void named_variable(Token token);
+    void named_variable(Token token, bool can_assign);
 
     Chunk* current();
     void emit_byte(u8 byte);

@@ -4,7 +4,6 @@
 #include "chunk.h"
 #include "compiler.h"
 #include "object.h"
-#include "opcode.h"
 #include "value.h"
 #include <cstddef>
 #include <expected>
